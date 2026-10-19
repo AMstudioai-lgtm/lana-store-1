@@ -1,9 +1,9 @@
 import { HERO_IMG } from '../data/catalogue'
 
 /* Hero immersif : photo PLEIN ÉCRAN (full-bleed).
-   UNE SEULE couche : plaque grise transparente à 30 % qui recouvre
-   TOUTE l'image (toute la largeur / toute la hauteur) pour la
-   lisibilité du texte posé dessus. */
+   RÈGLE RETENUE : un SEUL overlay gris transparent à 30 % sur toute
+   l'image, pour la lisibilité du texte. Rien d'autre (pas de plaque
+   derrière le texte, pas d'autres couches). */
 export default function Hero() {
   return (
     <section
