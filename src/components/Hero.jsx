@@ -14,12 +14,16 @@ export default function Hero() {
       <img
         src={HERO_IMG}
         alt="Montre classique sur fond blanc"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 z-0 h-full w-full object-cover"
         fetchpriority="high"
       />
 
-      {/* plaque grise transparente à 30 % : couvre TOUTE l'image */}
-      <div aria-hidden="true" className="absolute inset-0 h-full w-full bg-neutral-500/30" />
+      {/* OVERLAY GRIS transparent à 30 % — plein cadre, AU-DESSUS de l'image
+          et AU-DESSOUS du texte (z-order : image z-0 → overlay z-[1] → texte z-10) */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-[1] h-full w-full bg-neutral-800/30"
+      />
 
       {/* texte élégant en overlay, au centre */}
       <div className="relative z-10 flex flex-col items-center gap-3 px-6 text-center md:gap-4">
