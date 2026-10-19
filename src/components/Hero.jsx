@@ -13,7 +13,7 @@ export default function Hero() {
       {/* image plein écran, toute la largeur */}
       <img
         src={HERO_IMG}
-        alt="Montre classique sur fond blanc"
+        alt="Montre chronographe sur fond clair"
         className="absolute inset-0 z-0 h-full w-full object-cover"
         fetchpriority="high"
       />
