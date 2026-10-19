@@ -2,7 +2,7 @@
 const u = (id, w = 900) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
 
-export const HERO_IMG = u('1523170335258-f5ed11844a49', 1920) // montre sur fond studio clair
+export const HERO_IMG = u('1524592094714-0f0654e20314', 1600) // montre tenue en main, fond gris
 
 export const CATEGORIES = [
   {
