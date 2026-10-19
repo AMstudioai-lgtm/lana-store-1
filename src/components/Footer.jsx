@@ -16,7 +16,7 @@ export default function Footer() {
   }, [])
 
   return (
-    <footer id="contact" ref={ref} className="bg-neutral-950 text-neutral-400">
+    <footer id="contact" ref={ref} className="relative z-20 bg-neutral-950 text-neutral-400">
       <div className="mx-auto max-w-7xl px-6 py-20 md:px-10">
         <div className="reveal grid gap-14 md:grid-cols-2">
           {/* entreprise */}
