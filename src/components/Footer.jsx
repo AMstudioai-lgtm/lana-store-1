@@ -35,6 +35,15 @@ export default function Footer() {
                 </a>
               </li>
               <li>
+                Téléphone —{' '}
+                <a
+                  href="tel:+50934123456"
+                  className="border-b border-neutral-800 pb-0.5 text-neutral-200 transition-colors hover:text-white"
+                >
+                  +509 34 12 34 56
+                </a>
+              </li>
+              <li>
                 Ouverture —{' '}
                 <span className="text-neutral-200">Lun – Sam, 9 h 00 à 18 h 00</span>
               </li>

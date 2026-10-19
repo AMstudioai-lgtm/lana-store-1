@@ -34,10 +34,12 @@ export default function Promesse() {
 
       // entrée : 0 quand la section pointe en bas du viewport → 1 à 60 % d'avancée
       const entree = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.6)))
-      // sortie : redescend à 0 quand la section quitte par le haut (arrivée du footer)
-      const sortie = Math.min(1, Math.max(0, rect.bottom / (vh * 0.5)))
-      const p = reduit ? 1 : entree * sortie
+      const p = reduit ? 1 : entree
 
+      // Le calque couvre tout l'écran à l'entrée, puis se rétracte avec la section :
+      // sa hauteur s'arrête au bas de la section → le footer n'est JAMAIS flouté.
+      const hauteur = Math.min(vh, Math.max(0, rect.bottom))
+      flou.style.height = `${hauteur.toFixed(1)}px`
       flou.style.backdropFilter = `blur(${(p * 24).toFixed(1)}px)`
       flou.style.webkitBackdropFilter = flou.style.backdropFilter
       flou.style.backgroundColor = `rgba(23, 23, 23, ${(p * 0.3).toFixed(3)})`
@@ -68,8 +70,12 @@ export default function Promesse() {
       }}
       className="relative z-10"
     >
-      {/* calque de flou plein écran : ni début ni bord — tout l'écran fond doucement */}
-      <div ref={flouRef} aria-hidden="true" className="pointer-events-none fixed inset-0 z-0" />
+      {/* calque de flou plein écran, rétracté au bas de la section (footer jamais flouté) */}
+      <div
+        ref={flouRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-dvh"
+      />
 
       {/* contenu flottant : texte + carrés blancs, plats, posés sur le flou */}
       <div
