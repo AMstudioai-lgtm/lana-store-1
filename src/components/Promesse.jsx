@@ -1,56 +1,109 @@
+import { useEffect, useRef } from 'react'
 import { GARANTIES } from '../data/catalogue'
 import useReveal from '../hooks/useReveal'
 import { Truck, Shield, Refresh, Lock } from './icons'
 
 const ICONES = { truck: Truck, shield: Shield, refresh: Refresh, lock: Lock }
 
-/* Section Promesses = le MASQUE de verre : elle scrolle par-dessus la section
-   Catalogue restée pinned. Transparent à 30 % (gris foncé) + flou d'arrière-plan
-   : on voit le catalogue passer derrière le verre.
-   Bordures et texte blancs, plat (aucune ombre de relief). */
+/* Section Promesses : le catalogue (pinned) se FLOUTE progressivement au scroll
+   puis le texte et les cartes flottent par-dessus — comme détachés de l'écran.
+
+   Technique : un calque plein écran FIXE (fixed inset-0) dont le flou et le
+   voile gris (30%) montent de 0 à pleine intensité selon la progression du
+   scroll. Comme il couvre tout le viewport, le flou n'a NI commencement NI
+   bord visible (aucune trace de masque rectangulaire). */
 export default function Promesse() {
-  const ref = useReveal()
+  const reveal = useReveal()
+  const sectionRef = useRef(null)
+  const flouRef = useRef(null)
+  const contenuRef = useRef(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    const flou = flouRef.current
+    const contenu = contenuRef.current
+    if (!section || !flou || !contenu) return
+
+    const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let raf = 0
+
+    const calculer = () => {
+      raf = 0
+      const rect = section.getBoundingClientRect()
+      const vh = window.innerHeight
+
+      // entrée : 0 quand la section pointe en bas du viewport → 1 à 60 % d'avancée
+      const entree = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.6)))
+      // sortie : redescend à 0 quand la section quitte par le haut (arrivée du footer)
+      const sortie = Math.min(1, Math.max(0, rect.bottom / (vh * 0.5)))
+      const p = reduit ? 1 : entree * sortie
+
+      flou.style.backdropFilter = `blur(${(p * 24).toFixed(1)}px)`
+      flou.style.webkitBackdropFilter = flou.style.backdropFilter
+      flou.style.backgroundColor = `rgba(23, 23, 23, ${(p * 0.3).toFixed(3)})`
+      // le contenu glisse doucement vers sa place : sensation de flotter par-dessus
+      contenu.style.transform = `translateY(${((1 - p) * 56).toFixed(1)}px)`
+    }
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(calculer)
+    }
+
+    calculer()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
 
   return (
-    <section id="promesses" ref={ref} className="relative z-10">
-      {/* masque de verre 30 % qui recouvre le catalogue pinned */}
-      <div className="relative min-h-svh bg-neutral-950/30 backdrop-blur-2xl">
-        {/* masque de lisibilité : voile radial plat, pas une ombre */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(65%_60%_at_50%_50%,rgba(0,0,0,0.4),transparent_85%)]"
-        />
+    <section
+      id="promesses"
+      ref={(n) => {
+        sectionRef.current = n
+        reveal.current = n
+      }}
+      className="relative z-10"
+    >
+      {/* calque de flou plein écran : ni début ni bord — tout l'écran fond doucement */}
+      <div ref={flouRef} aria-hidden="true" className="pointer-events-none fixed inset-0 z-0" />
 
-        <div className="relative mx-auto flex min-h-svh max-w-6xl flex-col justify-center px-5 py-24 md:px-8">
-          <div className="reveal max-w-xl">
-            <p className="text-[11px] tracking-[0.5em] text-white/70 uppercase">Confiance</p>
-            <h2 className="mt-3 font-display text-3xl text-white md:text-5xl">
-              Nos promesses &amp; garanties
-            </h2>
-            <p className="mt-4 text-sm font-light leading-relaxed text-white/75">
-              Acheter chez Lana Store, c'est la sérénité : ce que nous promettons tient, du panier
-              à votre porte.
-            </p>
-          </div>
+      {/* contenu flottant : texte + carrés blancs, plats, posés sur le flou */}
+      <div
+        ref={contenuRef}
+        className="relative z-10 mx-auto flex min-h-svh max-w-6xl flex-col justify-center px-5 py-24 md:px-8"
+      >
+        <div className="reveal max-w-xl">
+          <p className="text-[11px] tracking-[0.5em] text-white/70 uppercase">Confiance</p>
+          <h2 className="mt-3 font-display text-3xl text-white md:text-5xl">
+            Nos promesses &amp; garanties
+          </h2>
+          <p className="mt-4 text-sm font-light leading-relaxed text-white/75">
+            Acheter chez Lana Store, c'est la sérénité : ce que nous promettons tient, du panier
+            à votre porte.
+          </p>
+        </div>
 
-          {/* promesses et garanties dans des carrés : bordures blanches, texte blanc, plat */}
-          <div className="reveal mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {GARANTIES.map((g) => {
-              const Icone = ICONES[g.icon]
-              return (
-                <div
-                  key={g.title}
-                  className="border border-white p-6 transition-colors duration-500 hover:bg-white/10"
-                >
-                  <Icone className="h-6 w-6 text-white" />
-                  <h3 className="mt-5 text-[13px] font-medium tracking-[0.15em] uppercase text-white">
-                    {g.title}
-                  </h3>
-                  <p className="mt-2 text-xs leading-relaxed text-white/80">{g.text}</p>
-                </div>
-              )
-            })}
-          </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {GARANTIES.map((g, i) => {
+            const Icone = ICONES[g.icon]
+            return (
+              <div
+                key={g.title}
+                style={{ transitionDelay: `${i * 110}ms` }}
+                className="reveal border border-white p-6 transition-colors duration-500 hover:bg-white/10"
+              >
+                <Icone className="h-6 w-6 text-white" />
+                <h3 className="mt-5 text-[13px] font-medium tracking-[0.15em] uppercase text-white">
+                  {g.title}
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-white/80">{g.text}</p>
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>
