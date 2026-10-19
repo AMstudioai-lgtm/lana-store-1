@@ -17,8 +17,8 @@ export default function Hero() {
         fetchpriority="high"
       />
 
-      {/* masque gris transparent à 30 % pour lever le texte */}
-      <div aria-hidden="true" className="absolute inset-0 bg-neutral-500/30" />
+      {/* masque gris transparent à 30 % pour la lisibilité du texte */}
+      <div aria-hidden="true" className="absolute inset-0 bg-neutral-700/30" />
 
       {/* texte en overlay, au centre de l'image */}
       <div className="relative z-10 flex flex-col items-center gap-3 px-6 text-center md:gap-4">

@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../data/catalogue'
 import useReveal from '../hooks/useReveal'
+import { usePanier } from '../context/panier'
+import { Plus } from './icons'
 
-/* Carte produit : image dans un carré, prix dans un rectangle à bordure sèche */
+/* Carte produit : image dans un carré, prix dans un rectangle à bordure sèche,
+   bouton « + » pour l'ajouter au panier (ajout immédiat, UI démo) */
 function CarteProduit({ p }) {
+  const { ajouter } = usePanier()
   return (
     <article className="group">
       <div className="relative aspect-square overflow-hidden bg-neutral-100">
@@ -13,6 +17,14 @@ function CarteProduit({ p }) {
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
+        <button
+          type="button"
+          onClick={() => ajouter(p)}
+          aria-label={`Ajouter ${p.name} au panier`}
+          className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white/85 backdrop-blur-md transition-colors duration-300 hover:bg-neutral-900 hover:text-white"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
       </div>
       <h3 className="mt-2.5 text-[13px] leading-snug text-neutral-700 transition-colors group-hover:text-neutral-900">
         {p.name}
